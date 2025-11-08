@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 const long long MOD = 1000000000;
@@ -67,24 +68,35 @@ int main() {
 
     // iterating through each column starting from the 1st one, as the 0th has been already initialized
     for (int col = 1; col < m; col++) {
-        currDP = vector<vector<vector<long long>>> (n, (vector<vector<long long>>(k + 1, vector<long long>(3, 0LL))));
+        // clear currDP values
+        for (int row_idx = 0; row_idx < n; ++row_idx) {
+            for (int k_idx = 0; k_idx <= k; ++k_idx) {
+                fill(currDP[row_idx][k_idx].begin(), currDP[row_idx][k_idx].end(), 0LL);
+            }
+        }
 
         // moving from left and from above
         for (int row = 0; row < n; row++) {
             for (int collected = 0; collected <= k; collected++) {
-
                 int newMushrooms = collected + hasMushroom[row][col];
                 if (newMushrooms > k) newMushrooms = k;
 
                 if (col > 0) { // from the left
-                    long long leftPaths = (prevDP[row][collected][0] + prevDP[row][collected][1]) % MOD;
-                    leftPaths = (leftPaths + prevDP[row][collected][2]) % MOD;
-                    currDP[row][newMushrooms][0] = (currDP[row][newMushrooms][0] + leftPaths) % MOD;
+                    long long leftPaths = prevDP[row][collected][0] + prevDP[row][collected][1];
+                    if (leftPaths >= MOD) leftPaths -= MOD;
+                    leftPaths = leftPaths + prevDP[row][collected][2];
+                    if (leftPaths >= MOD) leftPaths -= MOD;
+                    currDP[row][newMushrooms][0] = currDP[row][newMushrooms][0] + leftPaths;
+                    if (currDP[row][newMushrooms][0] >= MOD) currDP[row][newMushrooms][0] -= MOD;
                 }
 
                 if (row > 0) { // from above
-                    long long abovePaths = (currDP[row - 1][collected][0] + currDP[row - 1][collected][1]) % MOD;
-                    currDP[row][newMushrooms][1] = (currDP[row][newMushrooms][1] + abovePaths) % MOD;
+                    long long abovePaths = currDP[row - 1][collected][0] + currDP[row - 1][collected][1];
+                    if (abovePaths >= MOD) abovePaths -= MOD;
+                    abovePaths = abovePaths + currDP[row - 1][collected][2];
+                    if (abovePaths >= MOD) abovePaths -= MOD;
+                    currDP[row][newMushrooms][1] = currDP[row][newMushrooms][1] + abovePaths;
+                    if (currDP[row][newMushrooms][1] >= MOD) currDP[row][newMushrooms][1] -= MOD;
                 }
             }
         }
@@ -95,19 +107,22 @@ int main() {
                 if (newMushrooms > k) newMushrooms = k;
 
                 if (row < n - 1) {
-                    long long belowPaths = (currDP[row + 1][collected][0] + currDP[row + 1][collected][2]) % MOD;
-                    currDP[row][newMushrooms][2] = (currDP[row][newMushrooms][2] + belowPaths) % MOD;
+                    long long belowPaths = currDP[row + 1][collected][0] + currDP[row + 1][collected][2];
+                    if (belowPaths >= MOD) belowPaths -= MOD;
+                    currDP[row][newMushrooms][2] = currDP[row][newMushrooms][2] + belowPaths;
+                    if (currDP[row][newMushrooms][2] >= MOD) currDP[row][newMushrooms][2] -= MOD;
                 }
             }
         }
 
-        prevDP = currDP;
+        swap(prevDP, currDP);
     }
 
     long long result = 0LL;
 
     for (int dir = 0; dir < 3; dir++) {
-        result = (result + prevDP[n - 1][k][dir]) % MOD;
+        result += prevDP[n - 1][k][dir];
+        if (result >= MOD) result -= MOD;
     }
 
     cout << result << endl;

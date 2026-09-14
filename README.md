@@ -1,6 +1,6 @@
 # MUSHROOM PICKING
 
-This repository contains a C++ solution to the **“Na grzyby!” (Mushroom Picking)** problem from the ASD Laboratory (Algorythms & Data Structures course realised at the University of Warsaw). The task involves counting the number of valid paths through a grid-shaped forest where Bajtazar collects at least `k` mushrooms.
+A C++ solution to a grid-based optimization problem involving mushroom collection under path and memory constraints.
 
 ---
 
@@ -88,9 +88,29 @@ Efficient for `n, m ≤ 1000`, `k ≤ 10`, and 512 MB memory limit.
 
 ---
 
-## COMPILATION
+## Build
+
+### Using CMake
+
 ```bash
-g++ -std=c++17 -O2 -pipe main.cpp -o mushrooms
-./mushrooms < input.txt > output.txt
+mkdir build
+cd build
+cmake ..
+cmake --build .
 ```
 
+The executable can then be run from the build directory.
+
+
+### Using g++
+Alternatively, the program can be compiled directly with:
+
+```bash
+g++ -std=c++17 -O2 -pipe main.cpp -o mushrooms
+```
+
+and run with:
+
+```bash
+./mushrooms < input.txt > output.txt
+```
